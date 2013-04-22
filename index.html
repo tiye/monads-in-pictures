@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<!-- saved from url=(0083)http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html -->
+<html itemscope="" itemtype="http://schema.org/Blog"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Functors, Applicatives, And Monads In Pictures - adit.io</title>
+    
+    <meta name="viewport" content="width=320">
+    <meta itemprop="name" content="adit.io">
+    <meta itemprop="description" content="Aditya Bhargava&#39;s personal blog.">
+    <meta name="description" content="Aditya Bhargava&#39;s personal blog.">
+    <link href="http://fonts.googleapis.com/css?family=Ovo|Lato:300,900" rel="stylesheet">
+    <link rel="stylesheet" href="http://adit.io/css/reset.css">
+    <link rel="stylesheet" href="http://adit.io/css/disqus.css">
+    <link rel="stylesheet" href="http://adit.io/css/prettify.css">
+    <link rel="stylesheet" href="http://adit.io/css/style.css">
+    <link rel="stylesheet" href="http://adit.io/css/bootstrap.css">
+    <script type="text/javascript" async="" src="./index_files/ga.js"></script><script type="text/javascript" src="./index_files/prettify.js"></script>
+    <script type="text/javascript" src="./index_files/lang-hs.js"></script>
+    <script type="text/javascript" src="./index_files/ga(1).js"></script>
+	<script type="text/javascript" async="" src="./index_files/embed.js"></script><script src="./index_files/alfie.js" async="" charset="UTF-8"></script></head>
+  <body onload="prettyPrint()">
+    <ul id="menu">
+      <li><a href="http://adit.io/index.html">&gt; adit.io</a></li>
+      <li><a href="http://git.io/egon">Github</a></li>
+    </ul>
+    <div id="container" class="container">
+      <div class="row">
+        <div id="content" class="span12">
+          
+<ul id="sections">
+<h2>内容</h2>
+<li><a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html#functors">Functor</a></li>
+<li><a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html#applicatives">Applicative</a></li>
+<li><a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html#monads">Monad</a></li>
+<li><a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html#conclusion">结论</a></li>
+
+</ul>
+
+          <h1>Functor, Applicative, 以及 Monad 的图片阐释</h1>
+<a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html"><time>原作者写于 April 17, 2013</time> <time class="second"></time></a>
+
+<p>这是个简单的值: <img src="./index_files/value.png"></p>
+<p>我们都知道怎么加一个函数应用到这个值上边: <img src="./index_files/value_apply.png"></p>
+<p>很简单了. 我们来扩展一下, 让任意的值是在一个上下文当中. 现在的情况你可以想象一个可以把值放进去的盒子:</p>
+<div class="figure">
+  <img src="./index_files/value_and_context.png">
+  <p class="caption"></p>
+</div>
+<p>现在你把一个函数应用到这个值的时候, <strong>根据其上下文</strong>你会得到不同的结果. 这就是 Functor, Applicative, Monad, Arrow 之类概念的基础. <code class="lang-rb"><span class="typ">Maybe</span></code> 数据类型定义了两种相关的上下文:</p>
+<div class="figure">
+  <img src="./index_files/context.png">
+  <p class="caption"></p>
+</div>
+<p>很快我们会看到对一个 <code class="lang-rb"><span class="typ">Just</span><span class="pln"> a</span></code> 和一个 <code class="lang-rb"><span class="typ">Nothing</span></code> 来说函数应用有何不同. 首先我们来说 Functor!</p>
+<h2 id="functors">Functor</h2>
+<p>当一个值被封装在一个上下文里, 你就不能拿普通函数来应用:</p>
+<div class="figure">
+  <img src="./index_files/no_fmap_ouch.png">
+  <p class="caption"></p>
+</div>
+<p>就在这里 <code class="lang-rb"><span class="pln">fmap</span></code> 出现了. <code class="lang-rb"><span class="pln">fmap</span></code> is from the street, <code class="lang-rb"><span class="pln">fmap</span></code> is hip to contexts. <code class="lang-rb"><span class="pln">fmap</span></code> 知道怎样将一个函数应用到一个带有上下文的值. 你可以对任何一个类型为 <code class="lang-rb"><span class="typ">Functor</span></code> 的类型使用 <code class="lang-rb"><span class="pln">fmap</span></code>.</p>
+<p>比如说, 想一下你想把 <code class="lang-rb"><span class="pun">(+</span><span class="lit">3</span><span class="pun">)</span></code> 应用到 <code class="lang-rb"><span class="typ">Just</span><span class="pln"> </span><span class="lit">2</span></code>. 用 <code class="lang-rb"><span class="pln">fmap</span></code>:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> fmap </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">2</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span></code>
+</pre>
+<p>这是在幕后所发生的:</p>
+<div class="figure">
+  <img src="./index_files/fmap_just.png">
+  <p class="caption"></p>
+</div>
+<p>
+  <strong>Bam!</strong>
+  <code class="lang-rb"><span class="pln">fmap</span></code> 告诉了我们那是怎么做到的!</p>
+<p>So then you’re like, 好吧 <code class="lang-rb"><span class="pln">fmap</span></code>, 请应用 <code class="lang-rb"><span class="pun">(+</span><span class="lit">3</span><span class="pun">)</span></code> 到一个 <code class="lang-rb"><span class="typ">Nothing</span></code>?</p>
+<div class="figure">
+  <img src="./index_files/fmap_nothing.png">
+  <p class="caption"></p>
+</div>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> fmap </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Nothing</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Nothing</span></span></code>
+</pre>
+<p>就像 Matrix 里的 Morpheus, <code class="lang-rb"><span class="pln">fmap</span></code> 就是知道要做什么; 你从 <code class="lang-rb"><span class="typ">Nothing</span></code> 开始, 那么你再由 <code class="lang-rb"><span class="typ">Nothing</span></code> 结束! <code class="lang-rb"><span class="pln">fmap</span></code> 是禅. So now you’re all like, <strong>准确说究竟什么是 Functor?</strong> 嗯, Functor 就是任何能用 <code class="lang-rb"><span class="pln">fmap</span></code> 操作的数据类型. 因此 <code class="lang-rb"><span class="typ">Maybe</span></code> 是个 functor. 而且我们很快会看到, list 也是 functor.</p>
+<p>这样上下文存在就有意义了. 比如, 这是在没有 <code class="lang-rb"><span class="typ">Maybe</span></code> 的语言里你操作一个数据库记录的方法:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">post </span></span><span class="pun"><span class="pun">=</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Post</span></span><span class="pun"><span class="pun">.</span></span><span class="pln"><span class="pln">find_by_id</span></span><span class="pun"><span class="pun">(</span></span><span class="lit"><span class="lit">1</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="kwd"><span class="kwd">if</span></span><span class="pln"><span class="pln"> post
+  </span></span><span class="kwd"><span class="kwd">return</span></span><span class="pln"><span class="pln"> post</span></span><span class="pun"><span class="pun">.</span></span><span class="pln"><span class="pln">title
+</span></span><span class="kwd"><span class="kwd">else</span></span><span class="pln"><span class="pln">
+  </span></span><span class="kwd"><span class="kwd">return</span></span><span class="pln"><span class="pln"> </span></span><span class="kwd"><span class="kwd">nil</span></span><span class="pln"><span class="pln">
+</span></span><span class="kwd"><span class="kwd">end</span></span></code>
+</pre>
+<p>但用 Haskell:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">fmap </span></span><span class="pun"><span class="pun">(</span></span><span class="pln"><span class="pln">getPostTitle</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="pln"><span class="pln">findPost </span></span><span class="lit"><span class="lit">1</span></span><span class="pun"><span class="pun">)</span></span></code>
+</pre>
+<p>如果 <code class="lang-rb"><span class="pln">findPost</span></code> 返回一条 post, 我们就通过 <code class="lang-rb"><span class="pln">getPostTitle</span></code> 得到了 title. 如果返回的是 <code class="lang-rb"><span class="typ">Nothing</span></code>, 我们加e得到 <code class="lang-rb"><span class="typ">Nothing</span></code>! 非常简洁, huh? <code class="lang-rb"><span class="pun">&lt;</span><span class="pln">$</span><span class="pun">&gt;</span></code> 是 <code class="lang-rb"><span class="pln">fmap</span></code> 的中缀表达式版本, 所以你经常是会看到:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">getPostTitle </span></span><span class="pun"><span class="pun">&lt;</span></span><span class="pln"><span class="pln">$</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="pln"><span class="pln">findPost </span></span><span class="lit"><span class="lit">1</span></span><span class="pun"><span class="pun">)</span></span></code>
+</pre>
+<p>另一个例子: 当你把函数应用到 list 时发生了什么?</p>
+<div class="figure">
+  <img src="./index_files/fmap_list.png">
+  <p class="caption"></p>
+</div>
+<p>List 仅仅是另一种让 <code class="lang-rb"><span class="pln">fmap</span></code> 以不同方式应用函数的上下文!</p>
+<p>Okay, okay, 最后一个例子: 你把一个函数应用到另一个函数时会发生什么?</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">fmap </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">1</span></span><span class="pun"><span class="pun">)</span></span></code>
+</pre>
+<p>这是个函数:</p>
+<div class="figure">
+  <img src="./index_files/function_with_value.png">
+  <p class="caption"></p>
+</div>
+<p>这是一个函数应用到另一个函数上:</p>
+<div class="figure">
+  <img src="./index_files/fmap_function.png">
+  <p class="caption"></p>
+</div>
+<p>结果就是又一个函数!</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> import </span></span><span class="typ"><span class="typ">Control</span></span><span class="pun"><span class="pun">.</span></span><span class="typ"><span class="typ">Applicative</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> let foo </span></span><span class="pun"><span class="pun">=</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;</span></span><span class="pln"><span class="pln">$</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">2</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> foo </span></span><span class="lit"><span class="lit">10</span></span><span class="pln"><span class="pln">
+</span></span><span class="lit"><span class="lit">15</span></span></code>
+</pre>
+<p>这就是函数复合! 就是说, <code class="lang-rb"><span class="pln">f </span><span class="pun">&lt;</span><span class="pln">$</span><span class="pun">&gt;</span><span class="pln"> g </span><span class="pun">==</span><span class="pln"> f </span><span class="pun">.</span><span class="pln"> g</span></code>!</p>
+<p>
+  <strong>注意:</strong> 目前为止我们做的是将上下文当作是一个容纳值的盒子. But sometimes the box analogy wears a little thin. 特别要记住: 盒子是有效的记忆图像, 然呵又是你并没有盒子. 有时你的 “盒子” 是个函数.</p>
+<h2 id="applicatives">Applicative</h2>
+<p>Applicative 把这带到了一个新的层次. 借助 applicative, 我们的 values 就被封装在了上下文里, 就像 Functor:</p>
+<div class="figure">
+  <img src="./index_files/value_and_context.png">
+  <p class="caption"></p>
+</div>
+<p>而我们的函数也被封装在了上下文里!</p>
+<div class="figure">
+  <img src="./index_files/function_and_context.png">
+  <p class="caption"></p>
+</div>
+<p>Yeah. Let that sink in. Applicative 并不是开玩笑. <code class="lang-rb"><span class="typ">Control</span><span class="pun">.</span><span class="typ">Applicative</span></code> 定义了 <code class="lang-rb"><span class="pun">&lt;*&gt;</span></code>, 这个函数知道怎样把<strong>封装在上下文里</strong>的函数应用到<strong>封装在上下文里</strong>的值:</p>
+<div class="figure">
+  <img src="./index_files/applicative_just.png">
+  <p class="caption"></p>
+</div>
+<p>也就是:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;*&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">2</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">==</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span></code>
+</pre>
+<p>使用 <code class="lang-rb"><span class="pun">&lt;*&gt;</span></code> 能带来一些有趣的情形. 比如:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">[(*</span></span><span class="lit"><span class="lit">2</span></span><span class="pun"><span class="pun">),</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)]</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;*&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">[</span></span><span class="lit"><span class="lit">1</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">2</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">]</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">[</span></span><span class="lit"><span class="lit">2</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">4</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">6</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">4</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">,</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">6</span></span><span class="pun"><span class="pun">]</span></span></code>
+</pre>
+<div class="figure">
+  <img src="./index_files/applicative_list.png">
+  <p class="caption"></p>
+</div>
+<p>这里有一些是你能用 Applicative 做, 而无法用 Functor 做到的. 你怎么才能把需要两个参数的函数应用到两个封装的值上呢?</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;</span></span><span class="pln"><span class="pln">$</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;</span></span><span class="pln"><span class="pln">$</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">4</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+ERROR </span></span><span class="pun"><span class="pun">???</span></span><span class="pln"><span class="pln"> WHAT DOES THIS EVEN MEAN WHY IS THE FUNCTION WRAPPED IN A JUST</span></span></code>
+</pre>
+<p>Applicative:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;</span></span><span class="pln"><span class="pln">$</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(+</span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;*&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">8</span></span></code>
+</pre>
+<p>
+  <code class="lang-rb"><span class="typ">Applicative</span></code> 把 <code class="lang-rb"><span class="typ">Functor</span></code> 推到了一边. “大腕儿用得起任意个参数的函数,” 他说. “用 <code class="lang-rb"><span class="pun">&lt;</span><span class="pln">$</span><span class="pun">&gt;</span></code> 和 <code class="lang-rb"><span class="pun">&lt;*&gt;</span></code> 武装之后, 我可以接受需要任何个未封装的值的函数. 然后我传进一些封装过的值, 再我就得到一个封装的值的输出! AHAHAHAHAH!”</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(*)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;</span></span><span class="pln"><span class="pln">$</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&lt;*&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">3</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">15</span></span></code>
+</pre>
+<div class="figure">
+  <img src="./index_files/TaTdV.gif" alt="An applicative watching a functor apply a function">
+  <p class="caption">一 applicative 看着一 functor 应用一函数</p>
+</div>
+<p>还有啦! 有一个叫做 <code class="lang-rb"><span class="pln">liftA2</span></code> 的函数也做一样的事:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> liftA2 </span></span><span class="pun"><span class="pun">(*)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">5</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">3</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">15</span></span></code>
+</pre>
+<h2 id="monads">Monad</h2>
+<p>如何学习 Monad:</p>
+<ol style="list-style-type: decimal">
+  <li>拿个计算机科学的 PhD.</li>
+  <li>把她抛在一边, 因为这个章节里你永不倒她!</li>
+</ol>
+<p>Monads add a new twist.</p>
+<p>Functor 应用函数到封装过的值:</p>
+<div class="figure">
+  <img src="./index_files/fmap.png">
+  <p class="caption"></p>
+</div>
+<p>Applicative 应用封装过的函数到封装过的值:</p>
+<div class="figure">
+  <img src="./index_files/applicative.png">
+  <p class="caption"></p>
+</div>
+<p>Monads 应用<strong>会返回封装过的值</strong>的函数到封装过的值. Monad 有个 <code class="lang-rb"><span class="pun">&gt;&gt;=</span></code> (念做 “bind”) 来做这个.</p>
+<p>一起看个例子. Good ol’ <code class="lang-rb"><span class="typ">Maybe</span></code> is a monad:</p>
+<div class="figure">
+  <img src="./index_files/context.png" alt="Just a monad hanging out">
+  <p class="caption">Just a monad hanging out</p>
+</div>
+<p>假定 <code class="lang-rb"><span class="pln">half</span></code> 是仅对偶数可用的函数:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">half x </span></span><span class="pun"><span class="pun">=</span></span><span class="pln"><span class="pln"> </span></span><span class="kwd"><span class="kwd">if</span></span><span class="pln"><span class="pln"> even x
+           </span></span><span class="kwd"><span class="kwd">then</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">(</span></span><span class="pln"><span class="pln">x </span></span><span class="str"><span class="str">`div`</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">2</span></span><span class="pun"><span class="pun">)</span></span><span class="pln"><span class="pln">
+           </span></span><span class="kwd"><span class="kwd">else</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Nothing</span></span></code>
+</pre>
+<div class="figure">
+  <img src="./index_files/half.png">
+  <p class="caption"></p>
+</div>
+<p>我们给它传入一个封装过的值会怎样?</p>
+<div class="figure">
+  <img src="./index_files/half_ouch.png">
+  <p class="caption"></p>
+</div>
+<p>我们要用到 <code class="lang-rb"><span class="pun">&gt;&gt;=</span></code>, 用来<strong>强推</strong>我们封装过的值到函数里去. 这是 <code class="lang-rb"><span class="pun">&gt;&gt;=</span></code> 的照片:</p>
+<div class="figure">
+  <img src="./index_files/plunger.jpg">
+  <p class="caption"></p>
+</div>
+<p>它怎么起作用的:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">3</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&gt;&gt;=</span></span><span class="pln"><span class="pln"> half
+</span></span><span class="typ"><span class="typ">Nothing</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">4</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&gt;&gt;=</span></span><span class="pln"><span class="pln"> half
+</span></span><span class="typ"><span class="typ">Just</span></span><span class="pln"><span class="pln"> </span></span><span class="lit"><span class="lit">2</span></span><span class="pln"><span class="pln">
+</span></span><span class="pun"><span class="pun">&gt;</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">Nothing</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">&gt;&gt;=</span></span><span class="pln"><span class="pln"> half
+</span></span><span class="typ"><span class="typ">Nothing</span></span></code>
+</pre>
+<p>其中发生了什么?</p>
+<div class="figure">
+  <img src="./index_files/monad_just.png">
+  <p class="caption"></p>
+</div>
+<p>如果你传进一个 <code class="lang-rb"><span class="typ">Nothing</span></code> 就更简单了:</p>
+<div class="figure">
+  <img src="./index_files/monad_nothing.png">
+  <p class="caption"></p>
+</div>
+<div class="figure">
+  <img src="./index_files/whoa.png">
+  <p class="caption"></p>
+</div>
+<p>酷! 我们来看另一个例子: 那个 <code class="lang-rb"><span class="pln">IO</span></code> monad:</p>
+<div class="figure">
+  <img src="./index_files/io.png">
+  <p class="caption"></p>
+</div>
+<p>明确的三个函数. <code class="lang-rb"><span class="pln">getLine</span></code> 获取用户输入而不接收参数:</p>
+<div class="figure">
+  <img src="./index_files/getLine.png">
+  <p class="caption"></p>
+</div>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">getLine </span></span><span class="pun"><span class="pun">::</span></span><span class="pln"><span class="pln"> IO </span></span><span class="typ"><span class="typ">String</span></span></code>
+</pre>
+<p>
+  <code class="lang-rb"><span class="pln">readFile</span></code> 接收一个字符串 (文件名) 再返回文件的内容:</p>
+<div class="figure">
+  <img src="./index_files/readFile.png">
+  <p class="caption"></p>
+</div>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">readFile </span></span><span class="pun"><span class="pun">::</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">FilePath</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">-&gt;</span></span><span class="pln"><span class="pln"> IO </span></span><span class="typ"><span class="typ">String</span></span></code>
+</pre>
+<p>
+  <code class="lang-rb"><span class="pln">putStrLn</span></code> 接收一个字符串打印:</p>
+<div class="figure">
+  <img src="./index_files/putStrLn.png">
+  <p class="caption"></p>
+</div>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">putStrLn </span></span><span class="pun"><span class="pun">::</span></span><span class="pln"><span class="pln"> </span></span><span class="typ"><span class="typ">String</span></span><span class="pln"><span class="pln"> </span></span><span class="pun"><span class="pun">-&gt;</span></span><span class="pln"><span class="pln"> IO </span></span><span class="pun"><span class="pun">()</span></span></code>
+</pre>
+<p>这三个函数接收一个常规的值 (或者不接收值) 返回一个封装过的值. 我们可以用 <code class="lang-rb"><span class="pun">&gt;&gt;=</span></code> 把一切串联起来!</p>
+<div class="figure">
+  <img src="./index_files/monad_io.png">
+  <p class="caption"></p>
+</div>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">getLine </span></span><span class="pun"><span class="pun">&gt;&gt;=</span></span><span class="pln"><span class="pln"> readFile </span></span><span class="pun"><span class="pun">&gt;&gt;=</span></span><span class="pln"><span class="pln"> putStrLn</span></span></code>
+</pre>
+<p>Aw yeah! 我们不需要在取消封装和重新封装 IO monad 的值上浪费时间. <code class="lang-rb"><span class="pun">&gt;&gt;=</span></code> 为我们做了那些工作!</p>
+<p>Haskell 还为 monad 提供了语法糖, 叫做 <code class="lang-rb"><span class="kwd">do</span></code> 表达式:</p>
+<pre class="lang-rb"><span class="pln">  </span><code class="lang-rb"><span class="pln"><span class="pln">foo </span></span><span class="pun"><span class="pun">=</span></span><span class="pln"><span class="pln"> </span></span><span class="kwd"><span class="kwd">do</span></span><span class="pln"><span class="pln">
+    filename </span></span><span class="pun"><span class="pun">&lt;-</span></span><span class="pln"><span class="pln"> getLine
+    contents </span></span><span class="pun"><span class="pun">&lt;-</span></span><span class="pln"><span class="pln"> readFile filename
+    putStrLn contents</span></span></code>
+</pre>
+<h2 id="conclusion">结论</h2>
+<div class="figure">
+  <img src="./index_files/recap.png">
+  <p class="caption"></p>
+</div>
+<ul>
+  <li>
+    <strong>functor:</strong> 通过 <code class="lang-rb"><span class="pln">fmap</span></code> 或者 <code class="lang-rb"><span class="pun">&lt;</span><span class="pln">$</span><span class="pun">&gt;</span></code> 应用是函数到封装过的值</li>
+  <li>
+    <strong>applicative:</strong> 通过 <code class="lang-rb"><span class="pun">&lt;*&gt;</span></code> 或者 <code class="lang-rb"><span class="pln">liftA</span></code> 应用封装过的函数到封装过的值</li>
+  <li>
+    <strong>monads:</strong> 通过 <code class="lang-rb"><span class="pun">&gt;&gt;=</span></code> 或者 <code class="lang-rb"><span class="pln">liftM</span></code> 应用会返回封装过的值的函数到封装过的值</li>
+</ul>
+<p>所以, 亲爱的朋友 (我想在这点上我们是朋友), 我想我们都一致认为 monad 是简单的而且是个高明的观念(tm). Now that you’ve wet your whistle on this guide, why not pull a Mel Gibson and grab the whole bottle. 看下 LYAH 上关于 Monad 的 <a href="http://learnyouahaskell-zh-tw.csie.org/zh-cn/a-fistful-of-monads.html">章节</a>. 很多东西我其实掩饰了因为 Miran 深入这方面做得很棒.</p>
+
+
+
+<div id="disqus_thread"><iframe id="dsq1" data-disqus-uid="1" allowtransparency="true" frameborder="0" role="complementary" style="width: 100%; border: none; overflow: hidden; height: 4548px;" width="100%" src="./index_files/saved_resource.html" scrolling="no" horizontalscrolling="no" verticalscrolling="no"></iframe><iframe id="dsq3" data-disqus-uid="3" allowtransparency="true" frameborder="0" role="application" style="width: 100%; border: none; overflow: hidden; display: none;" width="100%" src="./index_files/client.html"></iframe><iframe id="dsq-indicator-north" data-disqus-uid="-indicator-north" allowtransparency="true" frameborder="0" role="alert" style="width: 940px; border: none; overflow: hidden; top: 0px; min-width: 940px; max-width: 940px; position: fixed; max-height: 29px; min-height: 29px; height: 29px; display: none;" scrolling="no"></iframe><iframe id="dsq-indicator-south" data-disqus-uid="-indicator-south" allowtransparency="true" frameborder="0" role="alert" style="width: 940px; border: none; overflow: hidden; bottom: 0px; min-width: 940px; max-width: 940px; position: fixed; max-height: 29px; min-height: 29px; height: 29px; display: none;" scrolling="no"></iframe></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+    var disqus_shortname = 'aditio'; // required: replace example with your forum shortname
+    // var disqus_developer = 1; // developer mode is on
+
+
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the &lt;a href="http://disqus.com/?ref_noscript"&gt;comments powered by Disqus.&lt;/a&gt;</noscript>
+
+
+
+        </div>
+      </div>
+    </div>
+		
+	
+</body></html>
